@@ -40,37 +40,38 @@ class HBNBCommand(cmd.Cmd):
                 print("No help available for this command.")
 
     def do_create(self, arg):
-        """
-                Create a new instance of BaseModel and
-                save it to the JSON file.
-                Usage: create <class_name>
                 """
-        commands = shlex.split(arg)
-        if len(commands) == 0:
-            print('** class name missing **')
-        elif commands[0] not in self.valid_classes:
-            print("** class doesn't exist **")
-        else:
-            class_name = commands[0]
-            new_instance = eval(class_name)()
-            params = {}
-            for parm in commands[1:]:
-                key, value = parm.split("=")
-                if value[0] == '"' and value[-1] == '"':
-                    value = value[1:-1].replace('_', ' ')
-                elif '.' in value:
-                    value = float(value)
+                    Create a new instance of BaseModel and save it to the JSON file.
+                    Usage: create <class_name>
+                    """
+                commands = shlex.split(arg)
+                if len(commands) == 0:
+                    print('** class name missing **')
+                elif commands[0] not in self.valid_classes:
+                    print("** class doesn't exist **")
                 else:
-                    value = str(value)
-                params[key] = value
-                if hasattr(new_instance, key):
-                    setattr(new_instance, key, value)
-            storage.new(new_instance)
-            k = storage.save()
-            print(new_instance.id)
+                    class_name = commands[0]
+                    new_instance = eval(class_name)()
+                    params = {}
+                    for parm in commands[1:]:
+                        key, value = parm.split("=")
+                        if value[0] == '"' and value[-1] == '"':
+                            value = value[1:-1].replace('_', ' ')
+                        elif '.' in value:
+                            value = float(value)
+                        else:
+                            value = str(value)
+                        params[key] = value
+                        if hasattr(new_instance, key):
+                            setattr(new_instance, key, value)
+                storage.new(new_instance)
+                k = storage.save()
+                print(new_instance.id)
 
-            def do_show(self, arg):
-                """
+   
+
+    def do_show(self, arg):
+        """
                Show the string representation of an instance.
                Usage: show <class_name> <id>
                """
