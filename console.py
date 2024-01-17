@@ -40,36 +40,42 @@ class HBNBCommand(cmd.Cmd):
                 print("No help available for this command.")
 
     def do_create(self, arg):
+        """
+                Create a new instance of BaseModel and save it to the JSON file.
+                Usage: create <class_name>
                 """
-                    Create a new instance of BaseModel and save it to the JSON file.
-                    Usage: create <class_name>
-                    """
-                commands = shlex.split(arg)
-                if len(commands) == 0:
-                    print('** class name missing **')
-                elif commands[0] not in self.valid_classes:
-                    print("** class doesn't exist **")
-                else:
-                    class_name = commands[0]
-                    new_instance = eval(class_name)()
-                    params = {}
-                    for parm in commands[1:]:
-                        key, value = parm.split("=")
-                        if value[0] == '"' and value[-1] == '"':
-                            value = value[1:-1].replace('_', ' ')
-                        elif '.' in value:
-                            value = float(value)
-                        else:
+        try:
+            commands = arg.split(" ")
+            if len(commands) == 0:
+                print('** class name missing **')
+                return
+            elif commands[0] not in self.valid_classes:
+                print("** class doesn't exist **")
+                return
+            else:
+                class_name = commands[0]
+                new_instance = eval(class_name)()
+                params = {}
+                for i in range(1, len(commands)):
+                    key, value = tuple(commands[i].split("="))
+                    if value[0] == '"' and value[-1] == '"':
+                        value = value[1:-1].replace('_', ' ').replace('"', r'\"')
+                    elif '.' in value:
+                        value = float(value)
+                    else:
+                        try:
                             value = int(value)
-                        params[key] = value
-                        if hasattr(new_instance, key):
-                            setattr(new_instance, key, value)
-                storage.new(new_instance)
-                k = storage.save()
+                        except ValueError:
+                            # Skip if not a valid integer
+                            continue
+                    params[key] = value
+                    if hasattr(new_instance, key):
+                        setattr(new_instance, key, value)
+                storage.save()
                 print(new_instance.id)
-
-   
-
+        except ValueError:
+            print(ValueError)
+            return
     def do_show(self, arg):
         """
                Show the string representation of an instance.
