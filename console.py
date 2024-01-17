@@ -51,7 +51,20 @@ class HBNBCommand(cmd.Cmd):
         elif commands[0] not in self.valid_classes:
             print("** class doesn't exist **")
         else:
+
             new_instance = globals()["{}".format(commands[0])]()
+            params = {}
+            for parm in commands[1:]:
+                key, value = parm.split("=")
+                if value.startswith('"'):
+                    value = value.strip('"').replace("_", " ")
+                else:
+                    try:
+                        value = eval(value)
+                    except(SyntaxError, NameError):
+                        continue
+                params[key] = value
+            new_instance = eval(commands[0])(**params)
             storage.save()
             print(new_instance.id)
 
