@@ -41,7 +41,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """
-                Create a new instance of BaseModel and save it to the JSON file.
+                Create a new instance of BaseModel
+                and save it to the JSON file.
                 Usage: create <class_name>
                 """
         try:
@@ -59,7 +60,7 @@ class HBNBCommand(cmd.Cmd):
                 for i in range(1, len(commands)):
                     key, value = tuple(commands[i].split("="))
                     if value[0] == '"' and value[-1] == '"':
-                        value = value[1:-1].replace('_', ' ').replace('"', r'\"')
+                        value = value[1:-1].replace('_', ' ')
                     elif '.' in value:
                         value = float(value)
                     else:
@@ -76,6 +77,7 @@ class HBNBCommand(cmd.Cmd):
         except ValueError:
             print(ValueError)
             return
+
     def do_show(self, arg):
         """
                Show the string representation of an instance.
