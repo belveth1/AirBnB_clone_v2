@@ -51,25 +51,26 @@ class HBNBCommand(cmd.Cmd):
         elif commands[0] not in self.valid_classes:
             print("** class doesn't exist **")
         else:
-
-            new_instance = globals()["{}".format(commands[0])]()
+            class_name = commands[0]
+            new_instance = eval(class_name)()
             params = {}
             for parm in commands[1:]:
                 key, value = parm.split("=")
-                if value.startswith('"'):
-                    value = value.strip('"').replace("_", " ")
+                if value[0] == '"' and value[-1] == '"':
+                    value = value[1:-1].replace('_', ' ')
+                elif '.' in value:
+                    value = float(value)
                 else:
-                    try:
-                        value = eval(value)
-                    except(SyntaxError, NameError):
-                        continue
+                    value = str(value)
                 params[key] = value
-            new_instance = eval(commands[0])(**params)
-            storage.save()
+                if hasattr(new_instance, key):
+                    setattr(new_instance, key, value)
+            storage.new(new_instance)
+            k = storage.save()
             print(new_instance.id)
 
-    def do_show(self, arg):
-        """
+            def do_show(self, arg):
+                """
                Show the string representation of an instance.
                Usage: show <class_name> <id>
                """
