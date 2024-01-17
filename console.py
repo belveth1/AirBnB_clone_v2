@@ -60,7 +60,7 @@ class HBNBCommand(cmd.Cmd):
                         elif '.' in value:
                             value = float(value)
                         else:
-                            value = str(value)
+                            value = int(value)
                         params[key] = value
                         if hasattr(new_instance, key):
                             setattr(new_instance, key, value)
