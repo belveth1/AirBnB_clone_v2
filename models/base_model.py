@@ -2,7 +2,8 @@
 import uuid
 from datetime import datetime
 import models
-
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, DateTime, String
 
 """
 Module for the BaseModel class.
@@ -25,10 +26,10 @@ class BaseModel:
                     setattr(self, key, datetime.strptime(value, time_format))
                 else:
                     setattr(self, key, value)
-        models.storage.new(self)
 
     def save(self):
         self.updated_at = datetime.utcnow()
+        models.storage.new(self)
         models.storage.save()
 
     def to_dict(self):
@@ -36,8 +37,15 @@ class BaseModel:
         data_dic["__class__"] = self.__class__.__name__
         data_dic["created_at"] = self.created_at.isoformat()
         data_dic["updated_at"] = self.updated_at.isoformat()
+        try:
+            del data_dic["_sa_instance_state"]
+        except KeyError:
+            pass
         return data_dic
 
     def __str__(self):
         return "[{}] ({}) {}".format(self.__class__.__name__,
                                      self.id, self.__dict__)
+
+    def delete(self):
+        models.storage.delete(self)
