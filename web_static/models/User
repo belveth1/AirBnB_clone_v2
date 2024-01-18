@@ -1,0 +1,11 @@
+from air_bnb.models.base_class import BaseModel
+
+
+class User(BaseModel):
+    """
+       class User that handles users' information
+       """
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""
