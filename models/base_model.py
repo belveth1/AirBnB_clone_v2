@@ -8,10 +8,14 @@ from sqlalchemy import Column, DateTime, String
 """
 Module for the BaseModel class.
 """
-
+Base = declarative_base()
 
 class BaseModel:
     time_format = "%Y-%m-%dT%H:%M:%S.%f"
+    id = Column(String(60), primary_key=True, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+
 
     def __init__(self, *args, **kwargs):
         time_format = "%Y-%m-%dT%H:%M:%S.%f"
