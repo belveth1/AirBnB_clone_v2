@@ -1,55 +1,73 @@
 #!/usr/bin/python3
+"""This module defines a base class for all models in our hbnb clone"""
 import uuid
 from datetime import datetime
-import models
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, DateTime, String
+from sqlalchemy import Column, String, DateTime
+from models import ValueEnv
 
-"""
-Module for the BaseModel class.
-"""
-Base = declarative_base()
+if ValueEnv == "db":
+    Base = declarative_base()
+else:
+    Base = object
+
 
 class BaseModel:
-    time_format = "%Y-%m-%dT%H:%M:%S.%f"
-    id = Column(String(60), primary_key=True, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-
+    """A base class for all hbnb models"""
+    if ValueEnv == "db":
+        id = Column(String(60), unique=True, nullable=False, primary_key=True)
+        created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+        updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
-        time_format = "%Y-%m-%dT%H:%M:%S.%f"
+        """Initialize a new Base object.
+        Args:
+            args (won't be used): list of argumments.
+            kwargs: pass in dictionary as argumment.
+        """
         self.id = str(uuid.uuid4())
-        self.created_at = datetime.utcnow()
-        self.updated_at = datetime.utcnow()
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
         if kwargs:
-            for key, value in kwargs.items():
-                if key == "__class__":
-                    continue
-                elif key == "created_at" or key == "updated_at":
-                    setattr(self, key, datetime.strptime(value, time_format))
-                else:
-                    setattr(self, key, value)
+            for attr, v in kwargs.items():
+                # fix error: type of created_at and updated_at most be datetime
+                if attr in ('created_at', 'updated_at'):
+                    Nv = datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
+                    setattr(self, attr, Nv)
+                elif attr != "__class__":
+                    setattr(self, attr, v)
 
-    def save(self):
-        self.updated_at = datetime.utcnow()
-        models.storage.new(self)
-        models.storage.save()
-
-    def to_dict(self):
-        data_dic = self.__dict__.copy()
-        data_dic["__class__"] = self.__class__.__name__
-        data_dic["created_at"] = self.created_at.isoformat()
-        data_dic["updated_at"] = self.updated_at.isoformat()
-        try:
-            del data_dic["_sa_instance_state"]
-        except KeyError:
-            pass
-        return data_dic
+            # change move storage.new(self) to save()
+            # models.storage.new(self)
 
     def __str__(self):
-        return "[{}] ({}) {}".format(self.__class__.__name__,
-                                     self.id, self.__dict__)
+        """Returns a string representation of the instance"""
+        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
+        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
 
-    def delete(self):
-        models.storage.delete(self)
+    def save(self):
+        """Updates updated_at with current time when instance is changed"""
+        from models.__init__ import storage
+        self.updated_at = datetime.now()
+        # add storage.new(self) before storage.save()
+        storage.new(self)
+        storage.save()
+
+    def to_dict(self):
+        """Convert instance into dict format"""
+        dictionary = {}
+        dictionary.update(self.__dict__)
+        dictionary.update({'__class__':
+                          (str(type(self)).split('.')[-1]).split('\'')[0]})
+        dictionary['created_at'] = self.created_at.isoformat()
+        dictionary['updated_at'] = self.updated_at.isoformat()
+        # delete key _sa_instance_state
+        if '_sa_instance_state' in dictionary:
+            del (dictionary['_sa_instance_state'])
+        return dictionary
+
+    # add method delete
+    def to_delete(self):
+        """method to delete an instance"""
+        from models.__init__ import storage
+        storage.delete(self)
