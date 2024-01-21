@@ -7,7 +7,7 @@ Module for the State class.
 """
 
 
-class City(BaseModel):
+class City(BaseModel, Base):
     """
         Represent a state.
         Attributes:
