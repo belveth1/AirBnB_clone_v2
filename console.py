@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-mport cmd
+import cmd
 import shlex
 from models import storage
 import sys
