@@ -47,7 +47,7 @@ def python_route(text="iscool"):
             Returns:
                 str: "python <text>"
             """
-    return 'python {}'.format(text.replace('_', ' '))
+    return 'Python {}'.format(text.replace('_', ' '))
 
 
 if __name__ == "__main__":
