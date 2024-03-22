@@ -40,7 +40,7 @@ def c(text):
 
 @app.route('/python/<text>', strict_slashes=False)
 @app.route('/python', strict_slashes=False)
-def python_route(text="iscool"):
+def python_route(text="is cool"):
     """
             display “python ” followed by the value of the text variable
                 (replace underscore '_' symbols with a space ' ')
