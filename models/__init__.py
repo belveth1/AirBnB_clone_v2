@@ -8,7 +8,7 @@ Instantiates a storage object.
 """
 from os import getenv
 
-
+storage = getenv("HBNB_TYPE_STORAGE")
 if getenv("HBNB_TYPE_STORAGE") == "db":
     from models.engine.db_storage import DBStorage
     storage = DBStorage()
